@@ -9,14 +9,14 @@ import AuthService from "../services/AuthService";
 
 let map: mapboxgl.Map | undefined;
 const MAP_STYLE_URL = "mapbox://styles/mapbox/streets-v11";
-const center: LngLatLike = [40.412635, 56.141272];
+const center: LngLatLike = [40.412635, 56.141972];
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoiY2FyYWthem92IiwiYSI6ImNsNDFuY2tqNDA3bmQza2tjaWpraXkxZGcifQ.RXWBqGkSgaiwiAZcriLQ_Q";
 
 const fitBounds: LngLatBoundsLike = [
-  [40.40627600932007, 56.143400338408924],
-  [40.417559503446, 56.140095670823484],
+  [40.40655600932007, 56.149100338408924],
+  [40.417959503446, 56.140395670823484],
 ];
 const Map = () => {
   const [events, setEvents] = useState<IEvent[]>([]);
@@ -31,10 +31,10 @@ const Map = () => {
     map = new mapboxgl.Map({
       container: "map",
       style: MAP_STYLE_URL,
-      zoom: 10,
+      zoom: 16,
       center: center,
       fadeDuration: 0,
-      maxBounds: fitBounds,
+      // maxBounds: fitBounds,
     });
   }, []);
 

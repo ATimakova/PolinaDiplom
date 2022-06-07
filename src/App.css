@@ -17,7 +17,7 @@
   justify-content: flex-start;
 }
 .bg-dark {
-  background-color: #343a40 !important;
+  background-color: #62a5cb !important;
 }
 .navbar-expand .navbar-nav {
   flex-direction: row;
@@ -34,7 +34,7 @@
   list-style: none;
 }
 .navbar-dark .navbar-nav .nav-link {
-  color: rgba(255, 255, 255, 0.5);
+  color: #FFF;
 }
 .navbar-expand .navbar-nav .nav-link {
   padding-right: 0.5rem;
