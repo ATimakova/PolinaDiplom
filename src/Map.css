@@ -1,0 +1,79 @@
+.container,
+.container-fluid,
+.container-lg,
+.container-md,
+.container-sm,
+.container-xl {
+  width: 100%;
+  margin-right: 0;
+  margin-left: 0;
+  padding-right: 0;
+  padding-left: 0;
+}
+
+#map {
+  position: absolute;
+  top: 53px;
+  bottom: 0;
+  width: 100%;
+}
+
+.marker {
+  width: 27px;
+  height: 27px;
+  cursor: pointer;
+  background-size: cover;
+}
+
+.marker-EVENT {
+  background-image: url(./resources/event.png);
+}
+.marker-ATTRACTION {
+  background-image: url(./resources/attraction.png);
+}
+.marker-ADMINISTRATION {
+  background-image: url(./resources/administration.png);
+}
+.marker-ACTIVITY {
+  background-image: url(./resources/activity.png);
+}
+
+.mapboxgl-popup {
+  max-width: 200px;
+}
+
+.event-name {
+  font-size: 14px;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.event {
+  margin: 5px 0;
+}
+
+.mapboxgl-popup-close-button {
+  font-size: 30px;
+  top: 5px;
+  right: 5px;
+}
+.mapboxgl-popup-close-button:focus-visible {
+  outline: none;
+}
+
+.mapboxgl-popup-content {
+  border-radius: 10px;
+}
+
+.button {
+  width: 150px;
+  height: 35px;
+  background: #62a5cb;
+  border-radius: 22px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  cursor: pointer;
+  margin: 5px auto;
+}
