@@ -1,7 +1,9 @@
+import { Moment } from "moment";
+
 export type IEvent = {
     id: number;
     name: string;
-    date?: Date | null;
+    date?: Date | Moment | string | null;
     description: string;
     lng: number;
     lat: number;
@@ -11,18 +13,19 @@ export type IEvent = {
 
 
 export enum EventType {
-    EVENT,
-    ATTRACTION, 
-    ADMINISTRATION,
-    ACTIVITY
+    EVENT = 'EVENT',
+    ATTRACTION = 'ATTRACTION', 
+    ADMINISTRATION = 'ADMINISTRATION',
+    ACTIVITY = 'ACTIVITY'
 }
 
 export type IEventForm = {
+    id?: number,
     name: string;
-    date?: Date | null;
+    eventDate?: Date | Moment | string | null;
     description: string;
-    lng: number;
-    lat: number;
+    lng: number | null;
+    lat: number | null;
     type: EventType,
-    price?: number
+    price?: number | null
 };

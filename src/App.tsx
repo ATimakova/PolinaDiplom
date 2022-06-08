@@ -1,42 +1,44 @@
-import { useEffect } from "react";
 import "./App.css";
 import Map from "./components/Map";
 import { Switch, Route, Link } from "react-router-dom";
 import Login from "./components/Login";
 import Register from "./components/Register";
+import AuthService from "./services/AuthService";
 
 const App = () => {
+
+  const currentUser = AuthService.getCurrentUser()
   return (
     <div className="App">
       <nav className="navbar navbar-expand navbar-dark bg-dark">
-        {/* {currentUser ? (
+        {currentUser ? (
             <div className="navbar-nav ml-auto">
               <li className="nav-item">
                 <Link to={"/profile"} className="nav-link">
-                  {currentUser.username}
+                  {currentUser.surname + " " + currentUser.name + " " + currentUser.middleName}
                 </Link>
               </li>
               <li className="nav-item">
-                <a href="/login" className="nav-link" onClick={this.logOut}>
-                  LogOut
+                <a href="/login" className="nav-link" onClick={()=>AuthService.logout()}>
+                  Выйти
                 </a>
               </li>
             </div>
-          ) : ( */}
-        {
+          ) : (
           <div className="navbar-nav ml-auto">
             <li className="nav-item">
               <Link to={"/login"} className="nav-link">
-                Login
+                Войти
               </Link>
             </li>
 
-            <li className="nav-item">
+            {/* <li className="nav-item">
               <Link to={"/register"} className="nav-link">
-                Sign Up
+                Зарегистрироваться
               </Link>
-            </li>
+            </li> */}
           </div>
+          )
         }
       </nav>
 

@@ -1,3 +1,4 @@
+import moment from "moment";
 import { DEV_API } from "../common/constants";
 import { EventType, IEvent, IEventForm } from "../types/IEvent";
 
@@ -19,39 +20,7 @@ class ApiService {
         },
       })
         .then((res) => {
-          // return res.ok
-           // ? res.json()
-              return [
-                {
-                  id: 1,
-                  name: "event1",
-                  date: new Date(),
-                  description: "description 1",
-                  lng: 56.141272,
-                  lat: 40.412635,
-                  type: EventType.ACTIVITY,
-                },
-                {
-                  id: 2,
-                  name: "event2",
-                  date: new Date(),
-                  description: "description 2",
-                  lng: 56.141372,
-                  lat: 40.412235,
-                  type: EventType.ADMINISTRATION,
-                },
-                
-                {
-                  id: 3,
-                  name: "event3",
-                  date: new Date(),
-                  description: "description 3",
-                  lng: 56.141372,
-                  lat: 40.413235,
-                  type: EventType.EVENT,
-                  price: 10
-                },
-              ];
+          return res.json()
         })
         .then((events: IEvent[]) => {
           return result(events);
@@ -67,7 +36,7 @@ class ApiService {
    * Добавить новое мероприятие
    * @returns {Promise<IEvent[]>}
    */
-  public addEvents(data: IEventForm, access_token: string, ): Promise<IEvent[]> {
+  public addEvent(data: IEventForm, access_token: string, ): Promise<IEvent[]> {
     const url = `${DEV_API}/createEvent`;
     return new Promise((result, error) => {
       fetch(url, {
@@ -93,6 +62,34 @@ class ApiService {
   }
 
   
+  /**
+   * Добавить новое мероприятие
+   * @returns {Promise<IEvent[]>}
+   */
+   public editEvents(data: IEventForm, access_token: string, ): Promise<IEvent[]> {
+    const url = `${DEV_API}/createEvent`;
+    return new Promise((result, error) => {
+      fetch(url, {
+        method: "POST",
+        headers: {
+            'Accept': "application/json",
+            'Content-type': "application/json",
+            'Authorization': `Bearer ${access_token}`,
+        },
+        body: JSON.stringify(data),
+      })
+        .then((res) => {
+          return res.json()
+        })
+        .then((events: IEvent[]) => {
+          return result(events);
+        })
+        .catch((err) => {
+          console.error(err);
+          result([]);
+        });
+    });
+  }
 
   /**
    * Купить билет на мероприятие

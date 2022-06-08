@@ -12,10 +12,10 @@
 }
 
 #map {
-  position: absolute;
-  top: 53px;
+  position: relative;
   bottom: 0;
-  width: 100%;
+  height: calc(100vh - 53px);
+  width: 100vw;
 }
 
 .marker {
@@ -76,4 +76,22 @@
   color: #fff;
   cursor: pointer;
   margin: 5px auto;
+}
+
+.map-container {
+  display: flex;
+}
+
+.mapbox-gl-show_add_form {
+  background-image: url("./resources/add.png");
+  width: 24px;
+  height: 24px;
+  background-repeat: no-repeat;
+  border: none;
+  background-position: center;
+  background-color: transparent;
+}
+
+.mapboxgl-control-container, .mapboxgl-ctrl-group.mapboxgl-ctrl {
+  background-color: transparent;
 }

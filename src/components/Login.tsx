@@ -1,28 +1,14 @@
-import { Component, useState } from "react";
-import { RouteComponentProps, useHistory } from "react-router-dom";
+import { useState } from "react";
+import { useHistory } from "react-router-dom";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import "../Login.css";
 import AuthService from "../services/AuthService";
 import IUser from "../types/IUser";
 
-interface RouterProps {
-  history: string;
-}
-
-type Props = RouteComponentProps<RouterProps>;
-
-type State = {
-  username: string;
-  password: string;
-  loading: boolean;
-  message: string;
-};
 const Login = () => {
   const [message, setMessage] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
-  const [login, setUsername] = useState<string>();
-  const [password, setpassword] = useState<string>();
 
   const history = useHistory();
   const initialValues = {
@@ -45,6 +31,7 @@ const Login = () => {
       .then((response: IUser) => {
         if (response.token) {
           localStorage.setItem("user", JSON.stringify(response));
+          history.push('/')
         }
         setLoading(false);
         setMessage("");

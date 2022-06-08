@@ -1,5 +1,4 @@
 import { DEV_API } from "../common/constants";
-import { EventType, IEvent } from "../types/IEvent";
 
 /**
  * Сервис для авторизации
@@ -21,6 +20,9 @@ class AuthService {
         },
         body: JSON.stringify(data),
       })
+        .then((response: any) => {
+          return response.json();
+        })
         .then((response: any) => {
           return result(response);
         })
