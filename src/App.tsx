@@ -2,7 +2,6 @@ import "./css/App.css";
 import Map from "./components/Map";
 import { Switch, Route, Link } from "react-router-dom";
 import Login from "./components/Login";
-import Register from "./components/Register";
 import { useDispatch, useSelector } from "react-redux";
 import { ReduxState } from "./types/types";
 import { setRole, setToken, setUserName } from "./actions/UserActions";
@@ -60,12 +59,6 @@ const App = () => {
                 Войти
               </Link>
             </li>
-
-            {/* <li className="nav-item">
-              <Link to={"/register"} className="nav-link">
-                Зарегистрироваться
-              </Link>
-            </li> */}
           </div>
         )}
       </nav>
@@ -73,7 +66,6 @@ const App = () => {
       <Switch>
         <Route exact path={["/", "/home"]} component={Map} />
         <Route exact path="/login" component={Login} />
-        <Route exact path="/register" component={Register} />
       </Switch>
     </div>
   );
