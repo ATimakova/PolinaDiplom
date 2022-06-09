@@ -114,7 +114,6 @@ const Map = () => {
   };
   const buyTicket = (id: number) => {
     ApiService.buyTicket(id, token).then((resp) => {
-      console.log(resp);
       if (resp) {
         map?.fire("closeAllPopups");
         ApiService.getMyEvents(token).then((data) => {

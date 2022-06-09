@@ -47,8 +47,6 @@ const EditForm = (props: Props) => {
   });
 
   useEffect(() => {
-    console.log(props.editData);
-
     if (props.editData) {
       formik.setValues({
         ...props.editData,
