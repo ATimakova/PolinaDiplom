@@ -1,26 +1,25 @@
-import { SetStateAction, useEffect, useState } from "react";
-import {
-  Formik,
-  Field,
-  Form,
-  ErrorMessage,
-  useFormikContext,
-  useFormik,
-} from "formik";
+import { useEffect } from "react";
+import { useFormik } from "formik";
 import * as Yup from "yup";
-import "../EditForm.css";
-import { EventType, IEventForm } from "../types/IEvent";
+import "../css/EditForm.css";
+import { EventType, IEvent, IEventForm } from "../types/IEvent";
 import { getTypeName } from "../common/constants";
 import moment from "moment";
 import ApiService from "../services/ApiService";
-import AuthService from "../services/AuthService";
+import { useDispatch, useSelector } from "react-redux";
+import { ReduxState } from "../types/types";
+import { setEvents } from "../actions/EventsActions";
 
 type Props = {
   editData?: IEventForm | null;
   coordinates?: mapboxgl.LngLat | null;
+  closeForm: () => void;
 };
 
 const EditForm = (props: Props) => {
+  const dispatch = useDispatch();
+  const token = useSelector(({ user }: ReduxState) => user?.token);
+
   const validationSchema = () => {
     return Yup.object().shape({
       name: Yup.string().required("Это поле обязательное!"),
@@ -41,63 +40,55 @@ const EditForm = (props: Props) => {
       lng: undefined,
       lat: undefined,
       type: EventType.EVENT,
-      price: undefined,
+      price: 0,
     },
     onSubmit: (values) => handleSubmit(values),
     validationSchema,
   });
 
   useEffect(() => {
+    console.log(props.editData);
+
     if (props.editData) {
       formik.setValues({
         ...props.editData,
         //@ts-ignore
-        eventDate: moment(props.editData.date).format("YYYY-MM-DDTHH:mm:ss"),
+        eventDate: moment(props.editData.date).format("YYYY-MM-DDTHH:mm"),
       });
     }
   }, [props.editData?.id]);
 
   useEffect(() => {
-    console.log(props.coordinates, formik.values);
-    if(props.coordinates?.lat)
-    formik.setValues({
-      ...formik.values,
-      //@ts-ignore
-      lat: props.coordinates?.lat,
-      //@ts-ignore
-      lng: props.coordinates?.lng,
-    });
+    if (props.coordinates?.lat)
+      formik.setValues({
+        ...formik.values,
+        //@ts-ignore
+        lat: props.coordinates?.lat,
+        //@ts-ignore
+        lng: props.coordinates?.lng,
+      });
   }, [props.coordinates]);
 
   const handleSubmit = (formValue: any) => {
-    console.log(
-      "🚀 ~ file: EditForm.tsx ~ line 66 ~ handleSubmit ~ formValue",
-      formValue
-    );
-    const token = AuthService.getCurrentUser().token;
-    console.log("🚀 ~ file: EditForm.tsx ~ line 78 ~ handleSubmit ~ token", token)
     if (token) {
       if (props.editData?.id) {
-        // ApiService.e(userData)
-        //   .then((response: IUser) => {
-        //     if (response.token) {
-        //       localStorage.setItem("user", JSON.stringify(response));
-        //     }
-        //     setLoading(false);
-        //     setMessage("");
-        //   })
-        //   .catch((error) => {
-        //     console.error(error);
-        //     setMessage("");
-        //     setLoading(false);
-        //   });
+        ApiService.editEvent(formValue, token)
+          .then((response: IEvent[]) => {
+            if (Array.isArray(response)) {
+              props.closeForm();
+              dispatch(setEvents(response));
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+          });
       } else {
         ApiService.addEvent(formValue, token)
-          .then((response: any) => {
-            console.log(
-              "🚀 ~ file: EditForm.tsx ~ line 70 ~ .then ~ response",
-              response
-            );
+          .then((response: IEvent[]) => {
+            if (Array.isArray(response)) {
+              props.closeForm();
+              dispatch(setEvents(response));
+            }
           })
           .catch((error) => {
             console.error(error);
@@ -108,6 +99,9 @@ const EditForm = (props: Props) => {
 
   return (
     <div className="edit-form__container">
+      <div className="close-form" onClick={() => props.closeForm()}>
+        ×
+      </div>
       <div className="title-form">
         {props.editData?.id ? "Редактирование маркера" : "Создание маркера"}
       </div>
@@ -137,11 +131,13 @@ const EditForm = (props: Props) => {
                 type="datetime-local"
                 className="form-control"
                 onChange={formik.handleChange}
-                value={moment(formik.values.eventDate).format("YYYY-MM-DDTHH:mm:ss")}
+                value={formik.values.eventDate}
               />
             </div>
             {formik.errors.eventDate && formik.touched.name ? (
-              <div className="alert alert-danger">{formik.errors.eventDate}</div>
+              <div className="alert alert-danger">
+                {formik.errors.eventDate}
+              </div>
             ) : null}
           </div>
           <div className="form-group">
@@ -168,14 +164,14 @@ const EditForm = (props: Props) => {
               <input
                 name="lng"
                 type="number"
-                className="form-control"
+                className="form-control coordinates"
                 onChange={formik.handleChange}
                 value={formik.values.lng}
               />
               <input
                 name="lat"
                 type="number"
-                className="form-control"
+                className="form-control coordinates"
                 onChange={formik.handleChange}
                 value={formik.values.lat}
               />
@@ -197,13 +193,22 @@ const EditForm = (props: Props) => {
                 onChange={formik.handleChange}
                 value={formik.values.type}
               >
-                <option value={EventType.EVENT} label={getTypeName(EventType.EVENT)} />
-                <option value={EventType.ATTRACTION} label={getTypeName(EventType.ATTRACTION)} />
+                <option
+                  value={EventType.EVENT}
+                  label={getTypeName(EventType.EVENT)}
+                />
+                <option
+                  value={EventType.ATTRACTION}
+                  label={getTypeName(EventType.ATTRACTION)}
+                />
                 <option
                   value={EventType.ADMINISTRATION}
                   label={getTypeName(EventType.ADMINISTRATION)}
                 />
-                <option value={EventType.ACTIVITY} label={getTypeName(EventType.ACTIVITY)} />
+                <option
+                  value={EventType.ACTIVITY}
+                  label={getTypeName(EventType.ACTIVITY)}
+                />
               </select>
             </div>
 
@@ -211,21 +216,24 @@ const EditForm = (props: Props) => {
               <div className="alert alert-danger">{formik.errors.type}</div>
             ) : null}
           </div>
-          <div className="form-group">
-            <div className="flex-container">
-              <label htmlFor="price">Стоимость</label>
-              <input
-                name="price"
-                type="number"
-                className="form-control"
-                onChange={formik.handleChange}
-                value={formik.values.price}
-              />
+          {(formik.values.type === EventType.EVENT ||
+            formik.values.type === EventType.ATTRACTION) && (
+            <div className="form-group">
+              <div className="flex-container">
+                <label htmlFor="price">Стоимость</label>
+                <input
+                  name="price"
+                  type="number"
+                  className="form-control"
+                  onChange={formik.handleChange}
+                  value={formik.values.price}
+                />
+              </div>
+              {formik.errors.price && formik.touched.price ? (
+                <div className="alert alert-danger">{formik.errors.price}</div>
+              ) : null}
             </div>
-            {formik.errors.price && formik.touched.price ? (
-              <div className="alert alert-danger">{formik.errors.price}</div>
-            ) : null}
-          </div>
+          )}
         </div>
         <div className="form-group">
           <button type="submit" className="btn btn-primary btn-block">

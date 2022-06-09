@@ -1,6 +1,5 @@
-import moment from "moment";
 import { DEV_API } from "../common/constants";
-import { EventType, IEvent, IEventForm } from "../types/IEvent";
+import { IEvent, IEventForm } from "../types/IEvent";
 
 /**
  * Сервис для получения данных
@@ -63,14 +62,14 @@ class ApiService {
 
   
   /**
-   * Добавить новое мероприятие
+   * Отредактировать мероприятие
    * @returns {Promise<IEvent[]>}
    */
-   public editEvents(data: IEventForm, access_token: string, ): Promise<IEvent[]> {
-    const url = `${DEV_API}/createEvent`;
+   public editEvent(data: IEventForm, access_token: string, ): Promise<IEvent[]> {
+    const url = `${DEV_API}/updateEvent/${data.id}`;
     return new Promise((result, error) => {
       fetch(url, {
-        method: "POST",
+        method: "PUT",
         headers: {
             'Accept': "application/json",
             'Content-type': "application/json",
@@ -95,7 +94,7 @@ class ApiService {
    * Купить билет на мероприятие
    * @returns {Promise<IEvent[]>}
    */
-   public buyTicket(id: number, access_token: string, ): Promise<IEvent[]> {
+   public buyTicket(id: number, access_token: string, ): Promise<Response> {
     const url = `${DEV_API}/secureEvent/${id}`;
     return new Promise((result, error) => {
       fetch(url, {
@@ -107,17 +106,40 @@ class ApiService {
         },
       })
         .then((res) => {
-          return res.json()
-        })
-        .then((events: IEvent[]) => {
-          return result(events);
+          return result(res)
         })
         .catch((err) => {
           console.error(err);
-          result([]);
         });
     });
   }
+
+    /**
+   * Получить список мероприятий юзера
+   * @returns {Promise<IEvent[]>}
+   */
+     public getMyEvents(access_token: string): Promise<IEvent[]> {
+      const url = `${DEV_API}/myEvents`;
+      return new Promise((result, error) => {
+        fetch(url, {
+          method: "GET",
+          headers: {
+            'Accept': "application/json",
+            'Authorization': `Bearer ${access_token}`,
+          },
+        })
+          .then((res) => {
+            return res.json()
+          })
+          .then((events: IEvent[]) => {
+            return result(events);
+          })
+          .catch((err) => {
+            console.error(err);
+            result([]);
+          });
+      });
+    }
 }
 
 export default new ApiService();

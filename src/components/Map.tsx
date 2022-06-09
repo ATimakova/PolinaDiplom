@@ -1,70 +1,127 @@
 import mapboxgl, { LngLat, LngLatLike } from "mapbox-gl";
-import { useEffect, useLayoutEffect, useState } from "react";
-import "../Map.css";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
+import "../css/Map.css";
 import { EventType, IEvent } from "../types/IEvent";
 import ApiService from "../services/ApiService";
 import moment from "moment";
 import { getTypeName } from "../common/constants";
-import AuthService from "../services/AuthService";
 import EditForm from "./EditForm";
+import { useDispatch, useSelector } from "react-redux";
+import { ReduxState } from "../types/types";
+import { setMyEvents } from "../actions/EventsActions";
 
-let map: mapboxgl.Map | undefined;
+let map: mapboxgl.Map;
 const MAP_STYLE_URL = "mapbox://styles/mapbox/streets-v11";
 const center: LngLatLike = [40.412635, 56.141972];
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoiY2FyYWthem92IiwiYSI6ImNsNDFuY2tqNDA3bmQza2tjaWpraXkxZGcifQ.RXWBqGkSgaiwiAZcriLQ_Q";
 
-// const fitBounds: LngLatBoundsLike = [
-//   [40.40655600932007, 56.149100338408924],
-//   [40.417959503446, 56.140395670823484],
-// ];
 const Map = () => {
-  const [events, setEvents] = useState<IEvent[]>([]);
+  const token = useSelector(({ user }: ReduxState) => user?.token);
+  const role = useSelector(({ user }: ReduxState) => user?.role);
+  const userName = useSelector(({ user }: ReduxState) => user?.userName);
+  const events = useSelector(({ events }: ReduxState) => events?.events);
+  const myEvents = useSelector(({ events }: ReduxState) => events?.myEvents);
+
+  const dispatch = useDispatch();
+
   const [editEvent, setEditEvent] = useState<IEvent | null>(null);
   const [addEvent, setAddEvent] = useState<boolean>(false);
   const [coordinates, setCoordinates] = useState<LngLat | null>(null);
 
-  useEffect(() => {
-    ApiService.getEvents().then((data) => {
-      console.log("🚀 ~ file: Map.tsx ~ line 30 ~ ApiService.getEvents ~ data", data)
-      setEvents(data);
-    });
-  }, []);
-
   useLayoutEffect(() => {
-    const showAddEventForm = () => {
-      setEditEvent(null);
-      setAddEvent(true);
-      map?.on('click', (e) => {
-        setCoordinates(e.lngLat)
-        });
-    };
-
     map = new mapboxgl.Map({
       container: "map",
       style: MAP_STYLE_URL,
       zoom: 16,
       center: center,
       fadeDuration: 0,
-      // maxBounds: fitBounds,
     });
-    if (AuthService.getCurrentUser()?.role === "ROLE_ADMIN") {
-      const control = document.createElement("div");
-      control.className = "event event-type";
+    map?.on("load", () => {
+      requestAnimationFrame(() => {
+        const getBoundsFromViewport = map.getBounds();
+        map.setMaxBounds(getBoundsFromViewport);
+      });
+    });
+  }, []);
 
+  useEffect(() => {
+    if (token) {
+      ApiService.getMyEvents(token).then((data) => {
+        dispatch(setMyEvents(data));
+      });
+    } else {
+      map?.fire("closeAllPopups");
+      dispatch(setMyEvents([]));
+    }
+  }, [token]);
+
+  useEffect(() => {
+    if (role === "ROLE_ADMIN") {
       const addEvent = new MapboxGLButtonControl({
         className: "mapbox-gl-show_add_form",
         eventHandler: showAddEventForm,
       });
-
       map?.addControl(addEvent, "top-right");
+    } else {
+      document
+        .querySelectorAll(".mapbox-gl-show_add_form")
+        .forEach((el) => el.remove());
     }
-  }, []);
+  }, [role]);
 
+  const setMarker = useCallback(
+    (e: any) => {
+      if (addEvent) {
+        setCoordinates(e.lngLat);
+        const markerAddElement = document.createElement("div");
+        markerAddElement.id = `marker-add`;
+        const markerAdd = new mapboxgl.Marker(markerAddElement, {
+          draggable: true,
+        })
+          .setLngLat([e.lngLat.lng, e.lngLat.lat])
+          .addTo(map);
+
+        markerAdd.on("dragend", () => {
+          const lngLat = markerAdd.getLngLat();
+          setCoordinates(lngLat);
+        });
+      }
+    },
+    [addEvent]
+  );
+  const handleClickRef = useRef(setMarker);
+  handleClickRef.current = setMarker;
+
+  const closeForm = () => {
+    setEditEvent(null);
+    setAddEvent(false);
+    setCoordinates(null);
+    document.querySelectorAll("#marker-add").forEach((el) => el.remove());
+  };
+
+  const showAddEventForm = () => {
+    setEditEvent(null);
+    setAddEvent(true);
+    map?.on("click", (event) => handleClickRef.current(event));
+  };
   const buyTicket = (id: number) => {
-    console.log("buy ticket " + id);
-    ApiService.buyTicket(id, AuthService.getCurrentUser()?.token);
+    ApiService.buyTicket(id, token).then((resp) => {
+      console.log(resp);
+      if (resp) {
+        map?.fire("closeAllPopups");
+        ApiService.getMyEvents(token).then((data) => {
+          dispatch(setMyEvents(data));
+        });
+      }
+    });
   };
 
   const handleEditEvent = (event: IEvent) => {
@@ -73,6 +130,8 @@ const Map = () => {
   };
 
   useEffect(() => {
+    map?.fire("closeAllPopups");
+    document.querySelectorAll(".marker").forEach((el) => el.remove());
     if (events.length > 0) {
       events.forEach((event: IEvent) => {
         const marker = document.createElement("div");
@@ -110,18 +169,23 @@ const Map = () => {
           position.innerHTML = `Координаты: ${[event.lng, event.lat]}`;
           htmlContent.appendChild(position);
           if (
-            (AuthService.getCurrentUser()?.role === "ROLE_USER" ||
-              AuthService.getCurrentUser() === null) &&
+            (role === "ROLE_USER" || userName === null) &&
             (event.type === EventType.EVENT ||
               event.type === EventType.ATTRACTION)
           ) {
-            const btnBuy = document.createElement("div");
-            btnBuy.className = "button-buy";
-            btnBuy.innerHTML = `Купить`;
-            btnBuy.addEventListener("click", () => buyTicket(event.id));
+            const btnBuy = document.createElement("button");
+            if (myEvents.find((i: IEvent) => i.id === event.id)) {
+              btnBuy.className = "button button-buy disabled";
+              btnBuy.innerHTML = `Билет уже куплен`;
+              btnBuy.disabled = true;
+            } else {
+              btnBuy.className = "button button-buy";
+              btnBuy.innerHTML = `Купить`;
+              btnBuy.addEventListener("click", () => buyTicket(event.id));
+            }
             htmlContent.appendChild(btnBuy);
           }
-          if (AuthService.getCurrentUser()?.role === "ROLE_ADMIN") {
+          if (role === "ROLE_ADMIN") {
             const editButton = document.createElement("div");
             editButton.className = "button button-edit";
             editButton.innerHTML = `Редактировать`;
@@ -144,12 +208,18 @@ const Map = () => {
         }
       });
     }
-  }, [events]);
+  }, [events, myEvents]);
 
   return (
     <div className="map-container">
       <div id="map"></div>
-      {(editEvent || addEvent) && <EditForm editData={editEvent} coordinates={coordinates}></EditForm>}
+      {(editEvent || addEvent) && (
+        <EditForm
+          editData={editEvent}
+          coordinates={coordinates}
+          closeForm={closeForm}
+        ></EditForm>
+      )}
     </div>
   );
 };

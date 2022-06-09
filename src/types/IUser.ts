@@ -1,7 +1,7 @@
-export default interface IUser {
-  token: String;
-  role: String;
-  name: String;
-  surname: String;
-  middleName: String;
+export type IUser = {
+  token: string;
+  role: string;
+  name: string;
+  surname: string;
+  middleName: string;
 }

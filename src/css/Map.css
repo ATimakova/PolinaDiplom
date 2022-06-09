@@ -26,16 +26,16 @@
 }
 
 .marker-EVENT {
-  background-image: url(./resources/event.png);
+  background-image: url(../resources/event.png);
 }
 .marker-ATTRACTION {
-  background-image: url(./resources/attraction.png);
+  background-image: url(../resources/attraction.png);
 }
 .marker-ADMINISTRATION {
-  background-image: url(./resources/administration.png);
+  background-image: url(../resources/administration.png);
 }
 .marker-ACTIVITY {
-  background-image: url(./resources/activity.png);
+  background-image: url(../resources/activity.png);
 }
 
 .mapboxgl-popup {
@@ -78,20 +78,36 @@
   margin: 5px auto;
 }
 
+.disabled{
+  background: #ccc;
+}
+
 .map-container {
   display: flex;
 }
 
 .mapbox-gl-show_add_form {
-  background-image: url("./resources/add.png");
-  width: 24px;
-  height: 24px;
+  background-image: url("../resources/add.png");
+  width: 35px !important;
+  height: 35px !important;
   background-repeat: no-repeat;
   border: none;
   background-position: center;
   background-color: transparent;
+  padding: 2px;
 }
 
 .mapboxgl-control-container, .mapboxgl-ctrl-group.mapboxgl-ctrl {
+  background-color: transparent;
+}
+
+
+#marker-add{
+  background-image: url("../resources/markerAdd.png");
+  width: 35px;
+  height: 40px;
+  background-repeat: no-repeat;
+  border: none;
+  background-position: center;
   background-color: transparent;
 }

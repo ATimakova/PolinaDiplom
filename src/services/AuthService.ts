@@ -1,4 +1,5 @@
 import { DEV_API } from "../common/constants";
+import { IUser } from "../types/IUser";
 
 /**
  * Сервис для авторизации
@@ -6,10 +7,9 @@ import { DEV_API } from "../common/constants";
 class AuthService {
   /**
    * Логин
-   * @returns {Promise<any>}
+   * @returns {Promise<IUser>}
    */
-  public login(data: any): Promise<any> {
-    console.log("🚀 ~ file: AuthService.ts ~ line 13 ~ AuthService ~ login ~ data", data)
+  public login(data: {login: string, password: string}): Promise<IUser> {
     const url = `${DEV_API}/auth`;
     return new Promise((result, error) => {
       fetch(url, {
@@ -23,7 +23,7 @@ class AuthService {
         .then((response: any) => {
           return response.json();
         })
-        .then((response: any) => {
+        .then((response: IUser) => {
           return result(response);
         })
         .catch((err) => {
@@ -31,10 +31,6 @@ class AuthService {
           return err
         });
     });
-  }
-
-  public logout() {
-    localStorage.removeItem("user");
   }
 
   //   public register(username: string, email: string, password: string) {
@@ -45,12 +41,6 @@ class AuthService {
   //     });
   //   }
 
-  public getCurrentUser() {
-    const userStr = localStorage.getItem("user");
-    if (userStr) return JSON.parse(userStr);
-
-    return null;
-  }
 }
 
 export default new AuthService();

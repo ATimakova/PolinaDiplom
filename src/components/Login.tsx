@@ -2,15 +2,19 @@ import { useState } from "react";
 import { useHistory } from "react-router-dom";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import "../Login.css";
+import "../css/Login.css";
 import AuthService from "../services/AuthService";
-import IUser from "../types/IUser";
+import { IUser } from "../types/IUser";
+import { useDispatch } from "react-redux";
+import { setRole, setToken, setUserName } from "../actions/UserActions";
 
 const Login = () => {
   const [message, setMessage] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
+  const dispatch = useDispatch();
   const history = useHistory();
+  
   const initialValues = {
     login: "",
     password: "",
@@ -31,7 +35,14 @@ const Login = () => {
       .then((response: IUser) => {
         if (response.token) {
           localStorage.setItem("user", JSON.stringify(response));
-          history.push('/')
+          dispatch(setToken(response.token));
+          dispatch(setRole(response.role));
+          dispatch(
+            setUserName(
+              response.surname + " " + response.name + " " + response.middleName
+            )
+          );
+          history.push("/");
         }
         setLoading(false);
         setMessage("");
@@ -60,7 +71,7 @@ const Login = () => {
           >
             <Form>
               <div className="form-group">
-                <label htmlFor="login">Login</label>
+                <label htmlFor="login">Логин</label>
                 <Field name="login" type="text" className="form-control" />
                 <ErrorMessage
                   name="login"
@@ -70,7 +81,7 @@ const Login = () => {
               </div>
 
               <div className="form-group">
-                <label htmlFor="password">Password</label>
+                <label htmlFor="password">Пароль</label>
                 <Field
                   name="password"
                   type="password"
@@ -92,7 +103,7 @@ const Login = () => {
                   {loading && (
                     <span className="spinner-border spinner-border-sm"></span>
                   )}
-                  <span>Login</span>
+                  <span>Войти</span>
                 </button>
               </div>
 

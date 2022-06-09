@@ -1,7 +1,9 @@
 .App {
   text-align: center;
 }
-*, ::after, ::before {
+*,
+::after,
+::before {
   box-sizing: border-box;
 }
 .navbar {
@@ -34,7 +36,7 @@
   list-style: none;
 }
 .navbar-dark .navbar-nav .nav-link {
-  color: #FFF;
+  color: #fff;
 }
 .navbar-expand .navbar-nav .nav-link {
   padding-right: 0.5rem;
@@ -128,4 +130,8 @@ label {
   margin-top: 50px;
   border-radius: 2px;
   box-shadow: 0px 2px 2px rgb(0 0 0 / 30%);
+}
+
+.logout {
+  cursor: pointer;
 }

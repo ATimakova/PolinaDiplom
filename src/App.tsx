@@ -1,33 +1,62 @@
-import "./App.css";
+import "./css/App.css";
 import Map from "./components/Map";
 import { Switch, Route, Link } from "react-router-dom";
 import Login from "./components/Login";
 import Register from "./components/Register";
-import AuthService from "./services/AuthService";
+import { useDispatch, useSelector } from "react-redux";
+import { ReduxState } from "./types/types";
+import { setRole, setToken, setUserName } from "./actions/UserActions";
+import { useEffect } from "react";
+import ApiService from "./services/ApiService";
+import { setEvents } from "./actions/EventsActions";
 
 const App = () => {
+  const currentUser = useSelector(({ user }: ReduxState) => user);
 
-  const currentUser = AuthService.getCurrentUser()
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    ApiService.getEvents().then((data) => {
+      dispatch(setEvents(data));
+    });
+    const userStr = localStorage.getItem("user");
+    if (userStr) {
+      const user = JSON.parse(userStr);
+      dispatch(setToken(user.token));
+      dispatch(setRole(user.role));
+      dispatch(
+        setUserName(user.surname + " " + user.name + " " + user.middleName)
+      );
+    }
+  }, []);
+
+  const logout = () => {
+    dispatch(setToken(undefined));
+    dispatch(setRole(undefined));
+    dispatch(setUserName(""));
+    localStorage.removeItem("user");
+  };
+
   return (
     <div className="App">
       <nav className="navbar navbar-expand navbar-dark bg-dark">
-        {currentUser ? (
-            <div className="navbar-nav ml-auto">
-              <li className="nav-item">
-                <Link to={"/profile"} className="nav-link">
-                  {currentUser.surname + " " + currentUser.name + " " + currentUser.middleName}
-                </Link>
-              </li>
-              <li className="nav-item">
-                <a href="/login" className="nav-link" onClick={()=>AuthService.logout()}>
-                  Выйти
-                </a>
-              </li>
-            </div>
-          ) : (
+        {currentUser.token ? (
           <div className="navbar-nav ml-auto">
             <li className="nav-item">
-              <Link to={"/login"} className="nav-link">
+              <div className="nav-link">
+                {currentUser.userName}
+              </div>
+            </li>
+            <li className="nav-item">
+              <div className="nav-link logout btn-primary" onClick={logout}>
+                Выйти
+              </div>
+            </li>
+          </div>
+        ) : (
+          <div className="navbar-nav ml-auto">
+            <li className="nav-item">
+              <Link to={"/login"} className="nav-link btn-primary">
                 Войти
               </Link>
             </li>
@@ -38,15 +67,14 @@ const App = () => {
               </Link>
             </li> */}
           </div>
-          )
-        }
+        )}
       </nav>
 
-        <Switch>
-          <Route exact path={["/", "/home"]} component={Map} />
-          <Route exact path="/login" component={Login} />
-          <Route exact path="/register" component={Register} />
-        </Switch>
+      <Switch>
+        <Route exact path={["/", "/home"]} component={Map} />
+        <Route exact path="/login" component={Login} />
+        <Route exact path="/register" component={Register} />
+      </Switch>
     </div>
   );
 };
