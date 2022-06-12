@@ -7,10 +7,13 @@ import { ReduxState } from "./types/types";
 import { setRole, setToken, setUserName } from "./actions/UserActions";
 import { useEffect } from "react";
 import ApiService from "./services/ApiService";
-import { setEvents } from "./actions/EventsActions";
+import { setEvents, setMyEvents } from "./actions/EventsActions";
+import MyTickets from "./components/MyTickets";
+import Reports from "./components/Reports";
 
 const App = () => {
   const currentUser = useSelector(({ user }: ReduxState) => user);
+  const token = useSelector(({ user }: ReduxState) => user?.token);
 
   const dispatch = useDispatch();
 
@@ -27,7 +30,18 @@ const App = () => {
         setUserName(user.surname + " " + user.name + " " + user.middleName)
       );
     }
+    
   }, []);
+
+  useEffect(() => {
+    if (token && currentUser.role === "ROLE_USER") {
+      ApiService.getMyEvents(token).then((data) => {
+        dispatch(setMyEvents(data));
+      });
+    } else {
+      dispatch(setMyEvents([]));
+    }
+  }, [token]);
 
   const logout = () => {
     dispatch(setToken(undefined));
@@ -46,6 +60,18 @@ const App = () => {
                 {currentUser.userName}
               </div>
             </li>
+            {
+            currentUser.role === "ROLE_USER" &&
+              <Link to={"/my-tickets"} className="nav-link">
+                Мои билеты
+              </Link>
+            }
+            {
+            currentUser.role === "ROLE_ADMIN" &&
+              <Link to={"/reports"} className="nav-link">
+                Отчеты
+              </Link>
+            }
             <li className="nav-item">
               <div className="nav-link logout btn-primary" onClick={logout}>
                 Выйти
@@ -66,6 +92,8 @@ const App = () => {
       <Switch>
         <Route exact path={["/", "/home"]} component={Map} />
         <Route exact path="/login" component={Login} />
+        <Route exact path="/my-tickets" component={MyTickets} />
+        <Route exact path="/reports" component={Reports} />
       </Switch>
     </div>
   );

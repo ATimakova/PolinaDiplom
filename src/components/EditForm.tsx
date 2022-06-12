@@ -132,7 +132,7 @@ const EditForm = (props: Props) => {
                 value={formik.values.eventDate}
               />
             </div>
-            {formik.errors.eventDate && formik.touched.name ? (
+            {formik.errors.eventDate && formik.touched.eventDate ? (
               <div className="alert alert-danger">
                 {formik.errors.eventDate}
               </div>

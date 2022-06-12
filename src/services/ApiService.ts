@@ -1,5 +1,6 @@
 import { DEV_API } from "../common/constants";
 import { IEvent, IEventForm } from "../types/IEvent";
+import { IReportEvent } from "../types/IReportEvent";
 
 /**
  * Сервис для получения данных
@@ -140,6 +141,35 @@ class ApiService {
           });
       });
     }
+
+    
+    /**
+   * Получить список мероприятий юзера
+   * @returns {Promise<IEvent[]>}
+   */
+     public getEventsReport(access_token: string, type: string, from: string, to: string): Promise<IReportEvent[]> {
+      const url = `${DEV_API}/report?type=${type}&from=${from}&to=${to}`;
+      return new Promise((result, error) => {
+        fetch(url, {
+          method: "GET",
+          headers: {
+            'Accept': "application/json",
+            'Authorization': `Bearer ${access_token}`,
+          },
+        })
+          .then((res) => {
+            return res.json()
+          })
+          .then((events: IReportEvent[]) => {
+            return result(events);
+          })
+          .catch((err) => {
+            console.error(err);
+            result([]);
+          });
+      });
+    }
+
 }
 
 export default new ApiService();

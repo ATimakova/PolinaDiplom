@@ -1,0 +1,38 @@
+.report-container{
+    margin: 1rem;
+}
+.filter form{
+    display: flex;
+    width: 50%;
+    align-items: baseline;
+}
+
+.filter .btn-primary {
+    margin-left: 10px;
+}
+
+.tab{
+    display: flex;
+}
+
+.tablinks{
+    border: none;
+    background-color: #FFF;
+    border-bottom: solid 2px transparent;
+    height: 50px;
+    margin-bottom: 10px;
+}
+
+.tablinks.active{
+    border-bottom: solid 2px #62a5cb;
+}
+
+
+.report-table{
+    width: 50%;
+}
+
+.report-table th{
+    background-color: rgba(98,165,203, 0.3);
+}
+

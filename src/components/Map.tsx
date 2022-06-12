@@ -52,16 +52,6 @@ const Map = () => {
     });
   }, []);
 
-  useEffect(() => {
-    if (token) {
-      ApiService.getMyEvents(token).then((data) => {
-        dispatch(setMyEvents(data));
-      });
-    } else {
-      map?.fire("closeAllPopups");
-      dispatch(setMyEvents([]));
-    }
-  }, [token]);
 
   useEffect(() => {
     if (role === "ROLE_ADMIN") {
