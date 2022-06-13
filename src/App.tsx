@@ -60,6 +60,9 @@ const App = () => {
                 {currentUser.userName}
               </div>
             </li>
+            <Link to={"/"} className="nav-link">
+                Главная
+              </Link>
             {
             currentUser.role === "ROLE_USER" &&
               <Link to={"/my-tickets"} className="nav-link">

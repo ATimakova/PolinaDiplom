@@ -71,8 +71,8 @@ const TableContent = ({ title, type }: { title: any; type: string }) => {
 
   useEffect(() => {
     formik.setValues({
-      from: moment().startOf("day").format("YYYY-MM-DDTHH:mm"),
-      to: moment().endOf("day").format("YYYY-MM-DDTHH:mm"),
+      from: moment().startOf("day").format("YYYY-MM-DDTHH:mm:ss"),
+      to: moment().endOf("day").format("YYYY-MM-DDTHH:mm:ss"),
     });
   }, [type]);
 
