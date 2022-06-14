@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import "../css/Reports.css";
 import { ReduxState } from "../types/types";
-import "react-tab-panel/index.css";
 import { useFormik } from "formik";
 import { IReportEvent } from "../types/IReportEvent";
 import ApiService from "../services/ApiService";
