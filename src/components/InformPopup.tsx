@@ -18,21 +18,28 @@ const PopupPayment = (props: IPopupPayment) => {
 
   const validationSchema = () => {
     return Yup.object().shape({
-      name: Yup.string().required("Это поле обязательное!").nullable(),
+      name: Yup.string()
+        .required("Это поле обязательное!")
+        .nullable()
+        .matches(
+          /^([A-Za-z\u00C0-\u00D6\u00D8-\u00f6\u00f8-\u00ff\s]*)$/gi,
+          "Возможно использование только латинских символов!"
+        )
+        .matches(/^\s*[\S]+(\s[\S]+)+\s*$/gms, "Введите имя и фамилию!"),
       date: Yup.string()
         .required("Это поле обязательное!")
-        .matches(/([0-9]{2})\/([0-9]{2})/, "Неверный формат даты: MM/YY")
+        .matches(/([0-9]{2})\/([0-9]{2})/, "Неверный формат даты: MM/YY!")
         .nullable(),
       cvc: Yup.string()
         .required("Это поле обязательное!")
         .nullable()
-        .max(3, "Некорректно введен CVC")
-        .min(3, "Некорректно введен CVC"),
+        .max(3, "Некорректно введен CVC!")
+        .min(3, "Некорректно введен CVC!"),
       number: Yup.string()
         .required("Это поле обязательное!")
         .nullable()
-        .min(16, "Номер карты должен содержать 16 символов")
-        .max(16, "Номер карты должен содержать 16 символов"),
+        .min(16, "Номер карты должен содержать 16 символов!")
+        .max(16, "Номер карты должен содержать 16 символов!"),
     });
   };
 
