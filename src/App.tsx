@@ -1,6 +1,6 @@
 import "./css/App.css";
 import Map from "./components/Map";
-import { Switch, Route, Link } from "react-router-dom";
+import { Switch, Route, NavLink, useHistory } from "react-router-dom";
 import Login from "./components/Login";
 import { useDispatch, useSelector } from "react-redux";
 import { ReduxState } from "./types/types";
@@ -17,8 +17,10 @@ const App = () => {
   const token = useSelector(({ user }: ReduxState) => user?.token);
 
   const dispatch = useDispatch();
+  const history = useHistory();
 
   useEffect(() => {
+    history.push("/home");
     ApiService.getEvents().then((data) => {
       dispatch(setEvents(data));
     });
@@ -31,7 +33,6 @@ const App = () => {
         setUserName(user.surname + " " + user.name + " " + user.middleName)
       );
     }
-    
   }, []);
 
   useEffect(() => {
@@ -57,32 +58,39 @@ const App = () => {
         {currentUser.token ? (
           <div className="navbar-nav ml-auto">
             <li className="nav-item">
-              <div className="nav-link">
-                {currentUser.userName}
-              </div>
+              <div className="nav-link">{currentUser.userName}</div>
             </li>
-            <Link to={"/"} className="nav-link active">
-                Главная
-              </Link>
-              
-            {
-            currentUser.role === "ROLE_USER" &&
-              <Link to={"/posters"} className="nav-link">
+            <NavLink to={"/home"} activeClassName="active" className="nav-link">
+              Главная
+            </NavLink>
+
+            {currentUser.role === "ROLE_USER" && (
+              <NavLink
+                activeClassName="active"
+                to={"/posters"}
+                className="nav-link"
+              >
                 Афиша
-              </Link>
-            }
-            {
-            currentUser.role === "ROLE_USER" &&
-              <Link to={"/my-tickets"} className="nav-link">
+              </NavLink>
+            )}
+            {currentUser.role === "ROLE_USER" && (
+              <NavLink
+                activeClassName="active"
+                to={"/my-tickets"}
+                className="nav-link"
+              >
                 Мои билеты
-              </Link>
-            }
-            {
-            currentUser.role === "ROLE_ADMIN" &&
-              <Link to={"/reports"} className="nav-link">
+              </NavLink>
+            )}
+            {currentUser.role === "ROLE_ADMIN" && (
+              <NavLink
+                activeClassName="active"
+                to={"/reports"}
+                className="nav-link"
+              >
                 Отчеты
-              </Link>
-            }
+              </NavLink>
+            )}
             <li className="nav-item">
               <div className="nav-link logout btn-primary" onClick={logout}>
                 Выйти
@@ -92,9 +100,9 @@ const App = () => {
         ) : (
           <div className="navbar-nav ml-auto">
             <li className="nav-item">
-              <Link to={"/login"} className="nav-link btn-primary">
+              <NavLink to={"/login"} className="nav-link btn-primary">
                 Войти
-              </Link>
+              </NavLink>
             </li>
           </div>
         )}

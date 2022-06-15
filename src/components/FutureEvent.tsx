@@ -51,29 +51,37 @@ const TableContent = ({ title, type }: { title: any; type: string }) => {
 
   const formik = useFormik({
     initialValues: {
-      from: moment().startOf("day").format("YYYY-MM-DDTHH:mm"),
-      to: moment().endOf("day").format("YYYY-MM-DDTHH:mm"),
+      from: moment().startOf("day").format("YYYY-MM-DDTHH:mm:ss"),
+      to: moment().endOf("month").format("YYYY-MM-DDTHH:mm:ss"),
     },
     onSubmit: (values) => {
-      if (values.from && values.to) {
-        ApiService.getEventsPoster(
-          currentUser.token,
-          type,
-          values.from,
-          values.to
-        ).then((posters: IPosterEvent[]) => {
-          setPosters(posters);
-        });
-      }
+      getPosters(values);
     },
   });
 
+  const getPosters = (values: { from: string; to: string }) => {
+    if (values.from && values.to) {
+      ApiService.getEventsPoster(
+        currentUser.token,
+        type,
+        values.from,
+        values.to
+      ).then((posters: IPosterEvent[]) => {
+        setPosters(posters);
+      });
+    }
+  };
   useEffect(() => {
     formik.setValues({
       from: moment().startOf("day").format("YYYY-MM-DDTHH:mm:ss"),
-      to: moment().endOf("day").format("YYYY-MM-DDTHH:mm:ss"),
+      to: moment().endOf("month").format("YYYY-MM-DDTHH:mm:ss"),
     });
+    getPosters(formik.initialValues);
   }, [type]);
+
+  useEffect(() => {
+    getPosters(formik.initialValues);
+  }, []);
 
   return (
     <>
@@ -85,7 +93,7 @@ const TableContent = ({ title, type }: { title: any; type: string }) => {
                 <input
                   name="from"
                   type="datetime-local"
-                  min={ moment().startOf("day").format("YYYY-MM-DDTHH:mm:ss")}
+                  min={moment().startOf("day").format("YYYY-MM-DDTHH:mm:ss")}
                   className="form-control"
                   onChange={formik.handleChange}
                   value={formik.values.from}
@@ -101,7 +109,7 @@ const TableContent = ({ title, type }: { title: any; type: string }) => {
                 <input
                   name="to"
                   type="datetime-local"
-                  min={ moment().endOf("day").format("YYYY-MM-DDTHH:mm:ss")}
+                  min={moment().endOf("day").format("YYYY-MM-DDTHH:mm:ss")}
                   className="form-control"
                   onChange={formik.handleChange}
                   value={formik.values.to}
@@ -130,12 +138,12 @@ const TableContent = ({ title, type }: { title: any; type: string }) => {
               </tr>
             </thead>
             <tbody>
-              {posters.map((poster: IPosterEvent) => {
+              {posters.map((poster: IPosterEvent, index: number) => {
                 return (
-                  <tr>
+                  <tr key={index}>
                     <td>{poster.name}</td>
                     <td>{poster.description}</td>
-                    <td>{poster.date}</td>
+                    <td>{moment(poster.date).format("DD.MM.YYYY HH:mm")}</td>
                     <td>{poster.price}</td>
                   </tr>
                 );

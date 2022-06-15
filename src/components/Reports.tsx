@@ -55,24 +55,29 @@ const TableContent = ({ title, type }: { title: any; type: string }) => {
       to: moment().endOf("day").format("YYYY-MM-DDTHH:mm"),
     },
     onSubmit: (values) => {
-      if (values.from && values.to) {
-        ApiService.getEventsReport(
-          currentUser.token,
-          type,
-          values.from,
-          values.to
-        ).then((reports: IReportEvent[]) => {
-          setReports(reports);
-        });
-      }
+      getReports(values)
     },
   });
+
+  const getReports = (values: { from: string; to: string }) => {
+    if (values.from && values.to) {
+      ApiService.getEventsReport(
+        currentUser.token,
+        type,
+        values.from,
+        values.to
+      ).then((reports: IReportEvent[]) => {
+        setReports(reports);
+      });
+    }
+  };
 
   useEffect(() => {
     formik.setValues({
       from: moment().startOf("day").format("YYYY-MM-DDTHH:mm:ss"),
       to: moment().endOf("day").format("YYYY-MM-DDTHH:mm:ss"),
     });
+    getReports(formik.initialValues);
   }, [type]);
 
   return (
@@ -127,9 +132,9 @@ const TableContent = ({ title, type }: { title: any; type: string }) => {
               </tr>
             </thead>
             <tbody>
-              {reports.map((report: IReportEvent) => {
+              {reports.map((report: IReportEvent, index: number) => {
                 return (
-                  <tr>
+                  <tr key={index}>
                     <td>{report.name}</td>
                     <td>{report.countTickets}</td>
                     <td>{report.totalAmount}</td>

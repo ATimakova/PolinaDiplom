@@ -2,6 +2,7 @@ import moment from "moment";
 import { useSelector } from "react-redux";
 import { getTypeName } from "../common/constants";
 import "../css/MyTickets.css";
+import { IEvent } from "../types/IEvent";
 import { ReduxState } from "../types/types";
 
 const MyTickets = () => {
@@ -25,9 +26,9 @@ const MyTickets = () => {
           </tr>
         </thead>
         <tbody>
-          {myEvents.map((event) => {
+          {myEvents.map((event: IEvent, index: number) => {
             return (
-              <tr>
+              <tr  key={index}>
                 <td>{event.name}</td>
                 <td>{getTypeName(event.type)}</td>
                 <td>{([event.lng, event.lat]).toString()}</td>

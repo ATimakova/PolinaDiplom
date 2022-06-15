@@ -42,7 +42,7 @@ const Login = () => {
               response.surname + " " + response.name + " " + response.middleName
             )
           );
-          history.push("/");
+          history.push("/home");
         }
         setLoading(false);
         setMessage("");
