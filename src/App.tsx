@@ -10,6 +10,7 @@ import ApiService from "./services/ApiService";
 import { setEvents, setMyEvents } from "./actions/EventsActions";
 import MyTickets from "./components/MyTickets";
 import Reports from "./components/Reports";
+import Posters from "./components/FutureEvent";
 
 const App = () => {
   const currentUser = useSelector(({ user }: ReduxState) => user);
@@ -60,9 +61,16 @@ const App = () => {
                 {currentUser.userName}
               </div>
             </li>
-            <Link to={"/"} className="nav-link">
+            <Link to={"/"} className="nav-link active">
                 Главная
               </Link>
+              
+            {
+            currentUser.role === "ROLE_USER" &&
+              <Link to={"/posters"} className="nav-link">
+                Афиша
+              </Link>
+            }
             {
             currentUser.role === "ROLE_USER" &&
               <Link to={"/my-tickets"} className="nav-link">
@@ -97,6 +105,7 @@ const App = () => {
         <Route exact path="/login" component={Login} />
         <Route exact path="/my-tickets" component={MyTickets} />
         <Route exact path="/reports" component={Reports} />
+        <Route exact path="/posters" component={Posters} />
       </Switch>
     </div>
   );

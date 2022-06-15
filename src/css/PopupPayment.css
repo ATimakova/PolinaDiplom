@@ -1,0 +1,39 @@
+.popup-payment-container{
+    position: absolute;
+    background-color: rgba(1,1,1,0.5);
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+}
+
+.popup-payment{
+    position: relative;
+    width: 500px;
+    height: fit-content;
+    margin: 120px auto;
+    background-color: #fff;
+    padding: 40px 20px 20px 20px
+}
+
+
+.close-payment-form{
+    position: absolute;
+    right: 10px;
+    top: -10px;
+    border: 0;
+    border-radius: 0 3px 0 0;
+    cursor: pointer;
+    background-color: transparent;
+    font-size: 50px;
+}
+
+.flex-payment{
+    justify-content: space-between;
+}
+.flex-payment .form-group{
+    width: 100%;
+}
+
+.flex-payment .form-group:first-of-type{
+    padding-right: 10px;
+}

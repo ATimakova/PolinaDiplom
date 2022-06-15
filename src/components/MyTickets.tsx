@@ -1,5 +1,4 @@
 import moment from "moment";
-import { useState } from "react";
 import { useSelector } from "react-redux";
 import { getTypeName } from "../common/constants";
 import "../css/MyTickets.css";

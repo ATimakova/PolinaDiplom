@@ -8,13 +8,12 @@ import {
 } from "react";
 import "../css/Map.css";
 import { EventType, IEvent } from "../types/IEvent";
-import ApiService from "../services/ApiService";
 import moment from "moment";
 import { getTypeName } from "../common/constants";
 import EditForm from "./EditForm";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { ReduxState } from "../types/types";
-import { setMyEvents } from "../actions/EventsActions";
+import InformPopup from "./InformPopup";
 
 let map: mapboxgl.Map;
 const MAP_STYLE_URL = "mapbox://styles/mapbox/streets-v11";
@@ -24,13 +23,11 @@ mapboxgl.accessToken =
   "pk.eyJ1IjoiY2FyYWthem92IiwiYSI6ImNsNDFuY2tqNDA3bmQza2tjaWpraXkxZGcifQ.RXWBqGkSgaiwiAZcriLQ_Q";
 
 const Map = () => {
-  const token = useSelector(({ user }: ReduxState) => user?.token);
   const role = useSelector(({ user }: ReduxState) => user?.role);
   const userName = useSelector(({ user }: ReduxState) => user?.userName);
   const events = useSelector(({ events }: ReduxState) => events?.events);
   const myEvents = useSelector(({ events }: ReduxState) => events?.myEvents);
-
-  const dispatch = useDispatch();
+  const [event, setEvent] = useState<number | null>(null);
 
   const [editEvent, setEditEvent] = useState<IEvent | null>(null);
   const [addEvent, setAddEvent] = useState<boolean>(false);
@@ -51,7 +48,6 @@ const Map = () => {
       });
     });
   }, []);
-
 
   useEffect(() => {
     if (role === "ROLE_ADMIN") {
@@ -103,14 +99,8 @@ const Map = () => {
     map?.on("click", (event) => handleClickRef.current(event));
   };
   const buyTicket = (id: number) => {
-    ApiService.buyTicket(id, token).then((resp) => {
-      if (resp) {
-        map?.fire("closeAllPopups");
-        ApiService.getMyEvents(token).then((data) => {
-          dispatch(setMyEvents(data));
-        });
-      }
-    });
+    map?.fire("closeAllPopups");
+    setEvent(id);
   };
 
   const handleEditEvent = (event: IEvent) => {
@@ -162,15 +152,21 @@ const Map = () => {
             (event.type === EventType.EVENT ||
               event.type === EventType.ATTRACTION)
           ) {
+            const form = document.createElement("form");
+            form.onsubmit = () => buyTicket(event.id);
+
             const btnBuy = document.createElement("button");
             if (myEvents.find((i: IEvent) => i.id === event.id)) {
-              btnBuy.className = "button button-buy disabled";
+              btnBuy.className = "";
               btnBuy.innerHTML = `Билет уже куплен`;
               btnBuy.disabled = true;
             } else {
               btnBuy.className = "button button-buy";
               btnBuy.innerHTML = `Купить`;
-              btnBuy.addEventListener("click", () => buyTicket(event.id));
+              btnBuy.id = "event-" + event.id;
+              btnBuy.addEventListener("click", () => {
+                buyTicket(event.id);
+              });
             }
             htmlContent.appendChild(btnBuy);
           }
@@ -181,6 +177,7 @@ const Map = () => {
             editButton.addEventListener("click", () => handleEditEvent(event));
             htmlContent.appendChild(editButton);
           }
+
           // create the popup
           const popup = new mapboxgl.Popup({ offset: 10 }).setDOMContent(
             htmlContent
@@ -208,6 +205,12 @@ const Map = () => {
           coordinates={coordinates}
           closeForm={closeForm}
         ></EditForm>
+      )}
+      {event && (
+        <InformPopup
+          eventId={event}
+          closeForm={() => setEvent(null)}
+        ></InformPopup>
       )}
     </div>
   );
