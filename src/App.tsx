@@ -11,6 +11,8 @@ import { setEvents, setMyEvents } from "./actions/EventsActions";
 import MyTickets from "./components/MyTickets";
 import Reports from "./components/Reports";
 import Posters from "./components/FutureEvent";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const App = () => {
   const currentUser = useSelector(({ user }: ReduxState) => user);
@@ -54,6 +56,15 @@ const App = () => {
 
   return (
     <div className="App">
+      
+      <ToastContainer 
+          position="top-center"
+          autoClose={5000}
+          hideProgressBar={true}
+          newestOnTop={false}
+          closeOnClick
+          pauseOnHover
+        />
       <nav className="navbar navbar-expand navbar-dark bg-dark">
         {currentUser.token ? (
           <div className="navbar-nav ml-auto">

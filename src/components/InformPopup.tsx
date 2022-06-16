@@ -5,6 +5,10 @@ import { useFormik } from "formik";
 import ApiService from "../services/ApiService";
 import { setMyEvents } from "../actions/EventsActions";
 import * as Yup from "yup";
+import { toast } from "react-toastify";
+
+import InputMask from 'react-input-mask';
+import moment from "moment";
 
 type IPopupPayment = {
   eventId: number;
@@ -29,7 +33,14 @@ const PopupPayment = (props: IPopupPayment) => {
       date: Yup.string()
         .required("Это поле обязательное!")
         .matches(/([0-9]{2})\/([0-9]{2})/, "Неверный формат даты: MM/YY!")
-        .nullable(),
+        .nullable()
+        .test(
+          "",
+          "Введите корректную дату! (ММ/ГГ)",
+          value => {
+            return moment(value).isValid();
+          }
+        ),
       cvc: Yup.string()
         .required("Это поле обязательное!")
         .nullable()
@@ -59,6 +70,8 @@ const PopupPayment = (props: IPopupPayment) => {
       if (resp) {
         ApiService.getMyEvents(token).then((data) => {
           dispatch(setMyEvents(data));
+          props.closeForm();
+          toast.success("оплата прошла успешно!");
         });
       }
     });
@@ -73,13 +86,14 @@ const PopupPayment = (props: IPopupPayment) => {
         <form onSubmit={formik.handleSubmit}>
           <div className="form-group">
             <label htmlFor="number">Номер карты</label>
-            <input
+            <InputMask 
+              mask='9999 9999 9999 9999' 
               name="number"
-              type="number"
               className="form-control"
               onChange={formik.handleChange}
               value={formik.values.number}
-            />
+            >
+              </InputMask>
             {formik.errors.number && formik.touched.number ? (
               <div className="alert alert-danger">{formik.errors.number}</div>
             ) : null}
@@ -102,28 +116,28 @@ const PopupPayment = (props: IPopupPayment) => {
             <div className="flex-container flex-payment">
               <div className="form-group">
                 <label htmlFor="date">Дата действия</label>
-                <input
+                <InputMask 
                   name="date"
-                  type="string"
-                  data-mask="MM/YY"
-                  placeholder="MM/YY"
+                  mask="99/99"
+                  placeholder='MM/YY'
                   className="form-control"
                   onChange={formik.handleChange}
                   value={formik.values.date}
-                />
+                  >
+                </InputMask >
                 {formik.errors.date && formik.touched.date ? (
                   <div className="alert alert-danger">{formik.errors.date}</div>
                 ) : null}
               </div>
               <div className="form-group">
                 <label htmlFor="cvc">CVC</label>
-                <input
+                <InputMask
                   name="cvc"
-                  type="number"
+                  mask="999"
                   className="form-control"
                   onChange={formik.handleChange}
                   value={formik.values.cvc}
-                />
+                  ></InputMask>
                 {formik.errors.cvc && formik.touched.cvc ? (
                   <div className="alert alert-danger">{formik.errors.cvc}</div>
                 ) : null}
