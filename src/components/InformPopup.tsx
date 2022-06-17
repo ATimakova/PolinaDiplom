@@ -40,11 +40,14 @@ const PopupPayment = (props: IPopupPayment) => {
 			cvc: Yup.string()
 				.required('Это поле обязательное!')
 				.nullable()
-				.min(3, 'Некорректно введен CVC!'),
+				.min(3, 'Некорректно введен CVC!')
+				.max(3, 'Некорректно введен CVC!'),
 			number: Yup.string()
 				.required('Это поле обязательное!')
 				.nullable()
-				.min(16, 'Номер карты должен содержать 16 символов!')
+				.test('', 'Номер карты должен содержать 16 символов!', (value) => {
+					return value?.replaceAll(/\s/g,'').replaceAll(/_/g,'')?.length === 16
+				})
 		})
 	}
 
